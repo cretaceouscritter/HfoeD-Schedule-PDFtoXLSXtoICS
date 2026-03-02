@@ -6,12 +6,12 @@ Kleine Toolchain, um Stundenpläne aus einer **PDF** erst nach **XLSX** und dana
 
 **Voraussetzungen:** 
 - Maven (Dependencies)
+- HfoeD Stundenplan in PDF-Form liegt in Ordner `\INPUT_PDF` (Dateiname egal)
 - Ordner `\OUTPUT_XLSX` ist angelegt
-- HfoeD Stundenplan in PDF-Form in Ordner `\INPUT_PDF`legen
 
 **Run:**
 - `PDF_to_XLSX.java` ausführen
-- In der Konsole die Anzahl  der Gruppen eingeben:
+- In der Konsole die Anzahl der Gruppen eingeben:
 
 **Output:**\
 Stundenplaene.xlsx in Ordner `OUTPUT_XLSX`
@@ -19,8 +19,8 @@ Stundenplaene.xlsx in Ordner `OUTPUT_XLSX`
 ## 2) XLSX → ICS (Python)
 
 **Voraussetzungen:**
-- Das erzeugte Stundenplaene.xlsx liegt in Ordner `OUTPUT_XLSX`
-- Ordner `OUTPUT_ICS` ist angelegt
+- Das erzeugte Stundenplaene.xlsx liegt in Ordner `\OUTPUT_XLSX`
+- Ordner `\OUTPUT_ICS` ist angelegt
 - Libraries `pandas`, `pytz` und `icalendar` müssen installiert sein
 
 **Run:**
