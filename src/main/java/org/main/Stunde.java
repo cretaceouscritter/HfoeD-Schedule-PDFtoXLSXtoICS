@@ -2,15 +2,15 @@ package org.main;
 
 public class Stunde {
 	private boolean belegt = false;
-    private String inhalt;
+    private String fach;
     private String raum;
     private String lehrkraft;
-    public String getInhalt() {
-        return inhalt;
+    public String getFach() {
+        return fach;
     }
 
-    public void setInhalt(String inhalt) {
-        this.inhalt = inhalt;
+    public void setFach(String fach) {
+        this.fach = fach;
     }
 
     public String getRaum() {
@@ -38,6 +38,6 @@ public class Stunde {
     @Override
     public String toString() {
     	if(!belegt)return "leere Stunde";
-        return "Inhalt: " + inhalt + ", Lehrkraft: " + lehrkraft + ", Raum: " + raum;
+        return "Fach: " + fach + ", Lehrkraft: " + lehrkraft + ", Raum: " + raum;
     }
 }

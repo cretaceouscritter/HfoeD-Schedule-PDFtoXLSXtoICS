@@ -6,15 +6,12 @@ import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
-import org.apache.poi.xssf.usermodel.XSSFColor;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 
 import java.awt.*;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.time.LocalDate;
-import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Scanner;
@@ -52,7 +49,7 @@ public class PDF_to_XLSX {
             // Parse each page
             int gruppe = 1;
             int woche = 0;
-            Tuple[][] coordinatesArray;
+            Coordinates[][] coordinatesArray;
             System.out.println(document.getNumberOfPages() + " Seiten eingelesen");
 
             for (int pageIndex = 0; pageIndex < document.getNumberOfPages(); pageIndex++) {
@@ -65,22 +62,22 @@ public class PDF_to_XLSX {
                 for (int i = 0; i < coordinatesArray.length; i++) {
 
                     for (int j = 0; j < 14; j++) {
-                        Tuple cell = coordinatesArray[i][j];
-                        float x = cell.getX();
-                        float y = cell.getY();
+                        Coordinates cell = coordinatesArray[i][j];
+                        float x = cell.X;
+                        float y = cell.Y;
 
-                        Tuple cellBelow;
+                        Coordinates cellBelow;
                         if (j == coordinatesArray[0].length - 1)
-                            cellBelow = new Tuple(y, coordinatesArray[i][j].getX() + 200);
+                            cellBelow = new Coordinates(y, coordinatesArray[i][j].X + 200);
                         else cellBelow = coordinatesArray[i][j + 1];
-                        float height = cellBelow.getY() - y; // Kein zusätzliches 5 hinzufügen
+                        float height = cellBelow.Y - y; // Kein zusätzliches 5 hinzufügen
 
                         // Breite dynamisch basierend anhand der Koordinaten der Zellen berechnen
-                        Tuple cellRight;
+                        Coordinates cellRight;
                         if (i == coordinatesArray.length - 1)
-                            cellRight = new Tuple(coordinatesArray[i][j].getX() + 200, 0);
+                            cellRight = new Coordinates(coordinatesArray[i][j].X + 200, 0);
                         else cellRight = coordinatesArray[i + 1][j];
-                        float width = cellRight.getX() - x;
+                        float width = cellRight.X - x;
 
                         Rectangle rect = new Rectangle((int) x - 1, (int) y, (int) width, (int) height);
                         stripper.setSortByPosition(true);
@@ -116,13 +113,13 @@ public class PDF_to_XLSX {
         }
     }
 
-    public static Tuple[][] create2DArray(float[] xCoordinates, float[] yCoordinates) {
-        Tuple[][] coordinatesArray = new Tuple[xCoordinates.length][yCoordinates.length];
+    public static Coordinates[][] create2DArray(float[] xCoordinates, float[] yCoordinates) {
+        Coordinates[][] coordinatesArray = new Coordinates[xCoordinates.length][yCoordinates.length];
         for (int i = 0; i < xCoordinates.length; i++) {
             for (int j = 0; j < yCoordinates.length; j++) {
                 // Verschiebe den Extraktionsbereich nach oben (zum Beispiel um 5 Einheiten)
                 float adjustedY = yCoordinates[j] - 10f;
-                coordinatesArray[i][j] = new Tuple(xCoordinates[i], adjustedY);
+                coordinatesArray[i][j] = new Coordinates(xCoordinates[i], adjustedY);
             }
         }
         return coordinatesArray;
