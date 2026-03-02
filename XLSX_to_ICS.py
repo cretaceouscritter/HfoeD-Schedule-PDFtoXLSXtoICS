@@ -3,7 +3,7 @@ import warnings
 import datetime
 from ics import Calendar, Event
 import pytz
-
+from zoneinfo import ZoneInfo
 
 # Suppress specific warnings
 warnings.filterwarnings("ignore", category=UserWarning, module="openpyxl")
@@ -93,29 +93,31 @@ def makeICS(cal, cell, group, week, day, hour):
     end_datetime = datetime.datetime.combine(event_date, end_time)
 
     # Naive Zeiten, keine Zeitzoneninformationen
-    start_datetime_naive = start_datetime.replace(tzinfo=None)
-    end_datetime_naive = end_datetime.replace(tzinfo=None)
+    # start_datetime_naive = start_datetime.replace(tzinfo=None)
+    # end_datetime_naive = end_datetime.replace(tzinfo=None)
 
     # kein bock mehr
-    start_datetime_naive = start_datetime_naive - datetime.timedelta(hours=1)
-    end_datetime_naive = end_datetime_naive - datetime.timedelta(hours=1)
+    # start_datetime_naive = start_datetime_naive - datetime.timedelta(hours=1)
+    # end_datetime_naive = end_datetime_naive - datetime.timedelta(hours=1)
+    start_datetime_berlin = start_datetime.replace(tzinfo=ZoneInfo("Europe/Berlin"))
+    end_datetime_berlin = end_datetime.replace(tzinfo=ZoneInfo("Europe/Berlin"))
 
     #bruh jetzt reichts
     # Überprüfen, ob es Freitag ist und ob die Startzeit nach 11:30 Uhr liegt
-    print(str(day) + "  " + str(start_datetime_naive.time()) + " " + str(datetime.time(11, 30)))
-    if day == 4 and start_datetime_naive.time() >= datetime.time(11, 00):
+    print(str(day) + "  " + str(start_datetime_berlin.time()) + " " + str(datetime.time(11, 30)))
+    if day == 4 and start_datetime_berlin.time() >= datetime.time(11, 00):
         # 15 Minuten abziehen
-        start_datetime_naive -= datetime.timedelta(minutes=15)
-        end_datetime_naive -= datetime.timedelta(minutes=15)
+        start_datetime_berlin -= datetime.timedelta(minutes=15)
+        end_datetime_berlin -= datetime.timedelta(minutes=15)
         print("AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA")
 
     # Debug-Ausgabe zur Überprüfung
-    #print(f"DEBUG: start_datetime_naive={start_datetime_naive}, end_datetime_naive={end_datetime_naive}")
+    #print(f"DEBUG: start_datetime_berlin={start_datetime_berlin}, end_datetime_berlin={end_datetime_berlin}")
     # Erstellen des Ereignisses
     event = Event()
     event.name = str(fachname).strip()
-    event.begin = start_datetime_naive
-    event.end = end_datetime_naive
+    event.begin = start_datetime_berlin
+    event.end = end_datetime_berlin
     event.description = str(lehrkraftname).strip()
     event.location = str(raum).strip()
     event.created = datetime.datetime.now()  # DTSTAMP
