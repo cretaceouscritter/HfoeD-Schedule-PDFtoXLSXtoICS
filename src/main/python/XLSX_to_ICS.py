@@ -3,16 +3,27 @@ import warnings
 import datetime
 import uuid
 import pytz
+import re
 from icalendar import Calendar, Event
-import openpyxl
 
 warnings.filterwarnings("ignore", category=UserWarning, module="openpyxl")
 
+def infer_groups_weeks(filepath: str) -> tuple[int, int]:
+    """Liest max. Gruppe/Woche aus Sheetnamen wie 'Gruppe3_Woche9'."""
+    xls = pd.ExcelFile(filepath)
+    mxg = mxw = 0
+    for name in xls.sheet_names:
+        m = re.match(r"^Gruppe(\d+)_Woche(\d+)$", name, re.I)
+        if m:
+            mxg = max(mxg, int(m.group(1)))
+            mxw = max(mxw, int(m.group(2)))
+    return mxg, mxw
+
+
 filepath = "OUTPUT_XLSX/Stundenplaene.xlsx"
 
-groups = 3
-weeks = 9
-start_date = datetime.date(2026, 3, 2)
+groups, weeks = infer_groups_weeks(filepath)
+start_date = datetime.date.fromisoformat(input("Startdatum (YYYY-MM-DD): ").strip())
 
 BERLIN = pytz.timezone("Europe/Berlin")
 
@@ -38,7 +49,7 @@ def makeICS(cal, cell, group, week, day, hour):
     try:
         fachname, lehrkraftname, raum = cell.split("#")[:3]
 
-        if "ZP_VI" in str(fachname): # Umbenennung Spezialfall
+        if "ZP_VI" in str(fachname):  # Umbenennung Spezialfall
             fachname = "ZP"
             lehrkraftname = ""
             raum = ""
@@ -70,11 +81,14 @@ def makeICS(cal, cell, group, week, day, hour):
     start_dt = BERLIN.localize(start_dt_naive, is_dst=None)
     end_dt = BERLIN.localize(end_dt_naive, is_dst=None)
 
+    start_utc = start_dt.astimezone(pytz.UTC)
+    end_utc = end_dt.astimezone(pytz.UTC)
+
     event = Event()
     event.add("uid", f"{uuid.uuid4()}@hfoed")
     event.add("summary", str(fachname).strip())
-    event.add("dtstart", start_dt)
-    event.add("dtend", end_dt)
+    event.add("dtstart", start_utc)  # <- UTC => DTSTART:...Z
+    event.add("dtend", end_utc)  # <- UTC => DTEND:...Z
     event.add("dtstamp", datetime.datetime.now(datetime.timezone.utc))
 
     desc = str(lehrkraftname).strip()
@@ -112,5 +126,5 @@ def week_to_ics(data, group, week):
 
 
 for group in range(1, groups + 1):
-    for week in range(1, weeks + 1):  # <- BUGFIX: weeks, nicht week
+    for week in range(1, weeks + 1):
         week_to_ics(data, group, week)
