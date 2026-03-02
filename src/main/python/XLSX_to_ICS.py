@@ -9,7 +9,7 @@ from icalendar import Calendar, Event
 warnings.filterwarnings("ignore", category=UserWarning, module="openpyxl")
 
 def infer_groups_weeks(filepath: str) -> tuple[int, int]:
-    """Liest max. Gruppe/Woche aus Sheetnamen wie 'Gruppe3_Woche9'."""
+    """Liest max. Gruppe/Woche aus Sheetnamen wie 'Gruppe3_Woche9'"""
     xls = pd.ExcelFile(filepath)
     mxg = mxw = 0
     for name in xls.sheet_names:
