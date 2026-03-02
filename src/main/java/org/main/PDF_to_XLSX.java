@@ -24,18 +24,26 @@ public class PDF_to_XLSX {
     public static void main(String[] args) {
         System.out.print("Anzahl Gruppen: ");
         int gruppenAnzahl = scanner.nextInt();
-        System.out.print("Anzahl Wochen: ");
-        int wochenAnzahl = scanner.nextInt();
-        try {
 
+        try {
+            /*
             scanner.nextLine();
             System.out.println("Enter Path to pdf File: (e.g. C:/Users/Name/Desktop/Stundenplaene_August.pdf) ");
             String filepath = scanner.nextLine();
             filepath.replace("\\", "/").replace("\"", "");
 
-
             File file = new File(filepath);
             PDDocument document = PDDocument.load(file);
+            */
+
+            File[] pdfs = new File("INPUT_PDF").listFiles(f -> f.getName().toLowerCase().endsWith(".pdf"));
+            if (pdfs == null || pdfs.length == 0) throw new RuntimeException("No PDF in INPUT_PDF");
+            File file = pdfs[0];
+            PDDocument document = PDDocument.load(pdfs[0]);
+
+            int wochenAnzahl = document.getNumberOfPages()/gruppenAnzahl;
+            System.out.printf("Anzahl Wochen: %d\n", wochenAnzahl);
+
             System.out.println(document.getNumberOfPages() + " Seiten erkannt");
 
             // Koordinaten der ersten Character von Spalte sind hier hardcoded
@@ -92,8 +100,8 @@ public class PDF_to_XLSX {
                         // Extrahiere Text innerhalb der Zelle
                         String cellText = stripper.getTextForRegion("region" + i);
 
-                        cellText = cellText.replaceAll("(?<=[A-Za-z\\d.])", "#");
-                        if (cellText == "\r") cellText = "";
+                    	cellText = cellText.replaceAll("(?<=[A-Za-z\\d\\.])\r", "#");
+                    	if(cellText == "\r")cellText ="";
 
                         allStuff[gruppe - 1][woche][i][j] = (j < 13) ? cellText : allStuff[0][0][0][12];
                     }
@@ -107,7 +115,7 @@ public class PDF_to_XLSX {
                 }
             }
 
-            writeSchedules(allStuff, "Stundenplaene.xlsx");
+            writeSchedules(allStuff, "OUTPUT_XLSX/Stundenplaene.xlsx");
             System.out.println("Daten vollständig in 'Stundenplaene.xlsx' geschrieben");
             document.close();
 
