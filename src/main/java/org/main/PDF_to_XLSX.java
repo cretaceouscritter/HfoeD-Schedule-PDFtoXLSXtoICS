@@ -36,49 +36,54 @@ public class PDF_to_XLSX {
 
             File file = new File(filepath);
             PDDocument document = PDDocument.load(file);
+            System.out.println(document.getNumberOfPages() + " Seiten erkannt");
 
-            // Define coordinates for the first character in each cell
+            // Koordinaten der ersten Character von Spalte sind hier hardcoded
             float[] xCoordinates = {131.2499F, 270.00018F, 408.7505F, 547.5008F, 686.2511F};
+            // Koordinaten der ersten Character jeder ZEILE werden hier berechnet
             ArrayList<Float>[] yCoordinates = PDFTextStripper.getCoords(file);
             for (int i = 0; i < yCoordinates.length; i++) {
                 Collections.sort(yCoordinates[i]);
             }
 
+            // Riesen Array um alle Daten zu speichern: Gruppen x Wochen x Tage x Stunden
             String[][][][] allStuff = new String[gruppenAnzahl][wochenAnzahl][5][14];
 
-            // Parse each page
             int gruppe = 1;
             int woche = 0;
             Coordinates[][] coordinatesArray;
-            System.out.println(document.getNumberOfPages() + " Seiten eingelesen");
 
+            // Jede Seite durchgehen
             for (int pageIndex = 0; pageIndex < document.getNumberOfPages(); pageIndex++) {
+                //
                 coordinatesArray = create2DArray(xCoordinates, convertToFloatArray(yCoordinates[pageIndex]));
 
                 PDFTextStripperByArea stripper = new PDFTextStripperByArea();
                 stripper.setSortByPosition(true);
 
-                // Extract text within specified coordinates
-                for (int i = 0; i < coordinatesArray.length; i++) {
+                // Text aus jeder Zelle einzelnd extrahieren
+                for (int i = 0; i < 5; i++) {           // Spalten
+                    for (int j = 0; j < 14; j++) {      // Zeilen
 
-                    for (int j = 0; j < 14; j++) {
                         Coordinates cell = coordinatesArray[i][j];
                         float x = cell.X;
                         float y = cell.Y;
 
-                        Coordinates cellBelow;
-                        if (j == coordinatesArray[0].length - 1)
-                            cellBelow = new Coordinates(y, coordinatesArray[i][j].X + 200);
-                        else cellBelow = coordinatesArray[i][j + 1];
-                        float height = cellBelow.Y - y; // Kein zusätzliches 5 hinzufügen
+                        // Höhe der Zelle
+                        Coordinates bottomBorder;
+                        if (j == coordinatesArray[0].length - 1) // Falls Zelle ganz unten -> keine weitere drunter
+                            bottomBorder = new Coordinates(y, coordinatesArray[i][j].X + 200);
+                        else bottomBorder = coordinatesArray[i][j + 1];
+                        float height = bottomBorder.Y - y;
 
-                        // Breite dynamisch basierend anhand der Koordinaten der Zellen berechnen
-                        Coordinates cellRight;
+                        // Breite der Zelle
+                        Coordinates rightBorder;
                         if (i == coordinatesArray.length - 1)
-                            cellRight = new Coordinates(coordinatesArray[i][j].X + 200, 0);
-                        else cellRight = coordinatesArray[i + 1][j];
-                        float width = cellRight.X - x;
+                            rightBorder = new Coordinates(coordinatesArray[i][j].X + 200, 0);
+                        else rightBorder = coordinatesArray[i + 1][j];
+                        float width = rightBorder.X - x;
 
+                        // Zelle als Rechteck definieren und das Rechteck aus dem Dokument extrahieren
                         Rectangle rect = new Rectangle((int) x - 1, (int) y, (int) width, (int) height);
                         stripper.setSortByPosition(true);
                         stripper.addRegion("region" + i, rect);
@@ -87,7 +92,7 @@ public class PDF_to_XLSX {
                         // Extrahiere Text innerhalb der Zelle
                         String cellText = stripper.getTextForRegion("region" + i);
 
-                        cellText = cellText.replaceAll("(?<=[A-Za-z\\d\\.])\r", "#");
+                        cellText = cellText.replaceAll("(?<=[A-Za-z\\d.])", "#");
                         if (cellText == "\r") cellText = "";
 
                         allStuff[gruppe - 1][woche][i][j] = (j < 13) ? cellText : allStuff[0][0][0][12];
@@ -117,7 +122,7 @@ public class PDF_to_XLSX {
         Coordinates[][] coordinatesArray = new Coordinates[xCoordinates.length][yCoordinates.length];
         for (int i = 0; i < xCoordinates.length; i++) {
             for (int j = 0; j < yCoordinates.length; j++) {
-                // Verschiebe den Extraktionsbereich nach oben (zum Beispiel um 5 Einheiten)
+                // Verschiebe den Extraktionsbereich nach oben (manuelle Feinjustierung)
                 float adjustedY = yCoordinates[j] - 10f;
                 coordinatesArray[i][j] = new Coordinates(xCoordinates[i], adjustedY);
             }

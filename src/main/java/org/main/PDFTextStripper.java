@@ -18,10 +18,6 @@ public class PDFTextStripper extends org.apache.pdfbox.text.PDFTextStripper {
     @Override
     protected void processTextPosition(TextPosition text) {
         super.processTextPosition(text);
-
-        // Print out the coordinates for each character
-       // System.out.println("Character: " + text.getUnicode() +
-              //  " at position: " + text.getXDirAdj() + "," + text.getYDirAdj());
         lines.add(text.getUnicode() +"," + text.getXDirAdj() + "," + text.getYDirAdj());
     }
 
@@ -74,7 +70,6 @@ public class PDFTextStripper extends org.apache.pdfbox.text.PDFTextStripper {
             String[] parts = line.split(",");
             resultArray[i]= parts;
             i++;
-            //System.arraycopy(parts, 0, resultArray[rowIndex++], 0, parts.length);
         }
 
         return resultArray;
