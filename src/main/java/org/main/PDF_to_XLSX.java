@@ -20,7 +20,7 @@ import java.util.Collections;
 import java.util.Scanner;
 
 
-public class Main {
+public class PDF_to_XLSX {
 	private static final Scanner scanner = new Scanner(System.in);
 	private static String empty;
     public static void main(String[] args) {
