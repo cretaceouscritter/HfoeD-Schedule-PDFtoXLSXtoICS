@@ -26,5 +26,5 @@ Stundenplaene.xlsx in Ordner `OUTPUT_XLSX`
 - `XLSX_to_ICS.py` ausführen
 - In der Konsole eingeben: Datum des ersten Tages der Stundenpläne (immer Montag)
 
-**Output**
+**Output:**\
 GruppeX_WocheX.ics Dateien im Ordner `OUTPUT_ICS`
