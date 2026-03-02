@@ -8,7 +8,7 @@ import pytz
 # Suppress specific warnings
 warnings.filterwarnings("ignore", category=UserWarning, module="openpyxl")
 # Pfad zur Excel-Datei
-filepath = "C:\\Users\\Aiden.Hintersberger\\OneDrive\\Desktop\\Stundenplaene_HfoeD2_1.xlsx"
+filepath = "C:\\Users\\Name\\OneDrive\\Desktop\\Stundenplaene_HfoeD2_1.xlsx"
 
 # Variablen für Gruppen und Wochen
 groups = 3
